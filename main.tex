@@ -1,0 +1,477 @@
+\documentclass[20pt,margin=1.0cm,blockverticalspace=1.1cm]{tikzposter}
+\geometry{paperwidth=90cm,paperheight=120cm}
+
+% ============================================================
+% Packages
+% ============================================================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[scaled]{helvet}
+\renewcommand\familydefault{\sfdefault}
+
+\usepackage{amsmath,amsfonts,amsthm,amssymb,bm}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{caption}
+\usepackage[font=small]{subcaption}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{soul}
+\usepackage{pifont}
+\usepackage{etoolbox}
+\usepackage{UWTheme}
+
+\AtBeginEnvironment{tikzfigure}{\captionsetup{type=figure}}
+
+% ============================================================
+% Colors / Theme
+% ============================================================
+\definecolor{yellowpastel}{RGB}{247,237,163}
+\sethlcolor{yellowpastel}
+
+\tikzposterlatexaffectionproofoff
+\usetheme{UWTheme}
+\usecolorstyle{UWStyle}
+\useblockstyle[titleinnersep=0.6cm,bodyinnersep=0.75cm]{Default}
+
+% ============================================================
+% Global spacing
+% ============================================================
+\setlength{\parskip}{0.6em}
+\setlist[itemize]{leftmargin=1.2em,itemsep=0.3em,topsep=0.25em}
+\renewcommand{\baselinestretch}{1.04}
+
+% ============================================================
+% Macros
+% ============================================================
+\newcommand{\G}{\mathcal{G}}
+\newcommand{\Rend}{\mathrm{Rend}}
+\newcommand{\Sim}{\mathrm{Sim}}
+\newcommand{\SE}{\mathrm{SE}}
+\newcommand{\bfp}{\mathbf{p}}
+\newcommand{\bfq}{\mathbf{q}}
+\newcommand{\bff}{\mathbf{f}}
+\newcommand{\bft}{\mathbf{t}}
+\newcommand{\cmark}{\ding{51}}
+\newcommand{\xmark}{\ding{55}}
+
+% ------------------------------------------------------------
+% Same-object visualization crop helper.
+% Assumes images/same_object.png contains 5 horizontal panels:
+% 0=FGR, 1=REGTR, 2=GaussReg, 3=GSA Coarse, 4=GSA Coarse+Fine.
+% ------------------------------------------------------------
+\newcommand{\SameObjectPanel}[3]{%
+\begin{minipage}[t]{#1}
+\centering
+\begin{tikzpicture}
+    \path[use as bounding box] (0,0) rectangle (\linewidth,4.25cm);
+    \begin{scope}
+        \clip (0,0) rectangle (\linewidth,4.25cm);
+        \node[
+            inner sep=0pt,
+            anchor=south west,
+            xshift=-#2\linewidth
+        ] at (0,0)
+        {\includegraphics[
+            trim=0mm 48mm 0mm 8mm,
+            clip,
+            width=5\linewidth,
+            height=4.25cm
+        ]{images/same_object.png}};
+    \end{scope}
+\end{tikzpicture}\\[-0.25em]
+\makebox[\linewidth][c]{\normalsize\textbf{#3}}
+\end{minipage}
+}
+
+% ============================================================
+% Title
+% ============================================================
+\title{%
+\parbox{0.93\linewidth}{\centering\bfseries
+Cross-Instance Gaussian Splatting Registration\\[-0.12em]
+via Geometry-Aware Feature-Guided Alignment}
+}
+
+\author{Roy Amoyal \quad Oren Freifeld \quad Chaim Baskin}
+\institute{Ben-Gurion University of the Negev, Israel}
+
+\begin{document}
+
+\maketitle
+
+% Logos
+\node[anchor=west,yshift=2.8cm,xshift=1.0cm] at (TP@title.west)
+{\includegraphics[trim=0mm 20mm 0mm 20mm,clip,height=4.6cm]{images/logos/logo_bgu.pdf}};
+
+\node[anchor=east,yshift=2.8cm,xshift=-1.0cm] at (TP@title.east)
+{\includegraphics[trim=0mm 0mm 0mm 0mm,clip,height=4.9cm]{images/logos/CVPR_Logo1_Denver 2026_Color.png}};
+
+\begin{columns}
+
+% ============================================================
+% LEFT COLUMN
+% ============================================================
+\column{0.49}
+
+\block{\huge Motivation \& Problem}{
+\Large
+\textbf{Goal: category-level 3DGS alignment.}
+Given two independently reconstructed Gaussian Splatting models, estimate a global similarity transform
+\[
+T=(s,R,\bft)\in\Sim(3)
+\]
+that aligns the source model $\G_1$ to the target model $\G_2$.
+
+\vspace{0.25em}
+
+\noindent
+\begin{minipage}[t]{0.48\linewidth}
+\textbf{Why it matters}
+\begin{itemize}[nosep,leftmargin=1.05em]
+    \item \mbox{Align different object instances.}
+    \item \mbox{Enable synchronized rendering.}
+    \item Support geometrically consistent object replacement.
+\end{itemize}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\linewidth}
+\textbf{Why it is hard}
+\begin{itemize}[nosep,leftmargin=1.05em]
+    \item \mbox{Arbitrary frames and scales.}
+    \item \mbox{Shape variation across instances.}
+    \item \mbox{Ambiguous or missing}\\
+          \mbox{correspondences.}
+\end{itemize}
+\end{minipage}
+}
+
+\block{\huge Geometry-Aware Semantic Features}{
+\centering
+\includegraphics[
+    trim=5mm 7mm 7mm 5mm,
+    clip,
+    width=1\linewidth,
+    height=12cm,
+    keepaspectratio
+]{images/semantic_geometric_features.png}
+
+\vspace{0.35em}
+
+\Large
+Geometry-aware semantic features capture both semantic similarity
+(e.g., wings, engines) and spatial distinctions
+(e.g., left/right, front/back).
+
+\vspace{0.55em}
+
+\includegraphics[
+    trim=0mm 30mm 0mm 10mm,
+    clip,
+    width=0.98\linewidth,
+    height=10.8cm,
+    keepaspectratio
+]{images/enhanced_features.png}
+
+\vspace{0.25em}
+
+\makebox[0.98\linewidth]{%
+    \makebox[0.24\linewidth][c]{\large\textbf{Input}}%
+    \makebox[0.24\linewidth][c]{\large\textbf{RGB Render}}%
+    \makebox[0.26\linewidth][c]{\large\textbf{Input Feat.}}%
+    \makebox[0.24\linewidth][c]{\large\textbf{Rendered Feat.}}%
+}
+
+\vspace{0.35em}
+
+\Large
+Low-resolution 2D semantic-geometric features are lifted into 3DGS and rendered as high-resolution feature maps.
+}
+
+\block{\huge GSA Overview}{
+\centering
+\includegraphics[
+    trim=7mm 45mm 7mm 8mm,
+    clip,
+    width=1.0\linewidth,
+    height=15.5cm,
+    keepaspectratio
+]{images/method_figure.png}
+
+\vspace{0.3em}
+
+\Large
+\textbf{GSA Full Pipeline}
+}
+
+\block{\huge Coarse: Feature-Guided Sim(3) Solver}{
+\Large
+\textbf{Idea:} extend ICP-like absolute orientation with semantic-geometric pruning, then solve a closed-form Sim(3) update.
+
+\vspace{0.35em}
+
+\textbf{1. Feature-guided candidate set}
+\[
+Q_i=\left\{\bfq_j\in\G_2\;\middle|\;
+\|\bff_i-\bff_j\|_2\leq\tau_f\right\}.
+\]
+
+\textbf{2. Spatial nearest neighbor after pruning}
+\[
+\bfq_i^{(k)}=\arg\min_{\bfq\in Q_i}
+\|\bfp_i^{(k)}-\bfq\|_2.
+\]
+
+\textbf{3. Closed-form similarity update}
+\[
+T^{(k)}=\arg\min_{T\in\Sim(3)}
+\sum_i\left\|T(\bfp_i^{(k)})-\bfq_i^{(k)}\right\|_2^2.
+\]
+
+\vspace{0.3em}
+
+\Large
+The coarse stage is robust to poor initializations, including large rotations, scale gaps, and cross-instance shape variation.
+}
+
+\block{\huge QR Code \& References}{
+\noindent
+\begin{minipage}[t]{0.25\linewidth}
+\vspace{0pt}
+\centering
+\includegraphics[width=0.8\linewidth]{images/gsa_web_qr_canva.jpeg}\\[-0.1em]
+% \includegraphics[width=0.16\linewidth]{images/qr_codes/website_logo.png}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.72\linewidth}
+\vspace{0pt}
+\Large
+Scan for paper, code, video, and additional results.
+
+\vspace{0.45em}
+
+\large
+\textbf{[1]} Mariotti et al. \emph{Improving Semantic Correspondence with Viewpoint-Guided Spherical Maps}. CVPR 2024.\\
+\textbf{[2]} Yen-Chen et al. \emph{INeRF: Inverting Neural Radiance Fields for Pose Estimation}. IROS 2021.
+\end{minipage}
+}
+
+% ============================================================
+% RIGHT COLUMN
+% ============================================================
+\column{0.49}
+\block{\huge Fine: From Inverse Radiance Fields to MVFC}{
+\Large
+
+\noindent\makebox[\linewidth][c]{\textbf{Classical inverse radiance-field pose estimation [2]}}\\[-1em]
+\[
+\min_{C\in\SE(3)}
+\left\|
+\Rend_{\rm rgb}(\G,C)-I_t
+\right\|_2^2.
+\]
+
+\vspace{0.5em}
+
+\noindent\makebox[\linewidth][c]{\textbf{Extension to multi-view field-to-field alignment}}\\[-1em]
+\[
+\min_{T\in\Sim(3)}
+\sum_{k=1}^{N}
+\left\|
+\Rend_{\rm rgb}(T\G_1,C_k^\star)
+-
+\Rend_{\rm rgb}(\G_2,C_k^\star)
+\right\|_2^2.
+\]
+
+\vspace{0.5em}
+
+\noindent\makebox[\linewidth][c]{\textbf{Adaptation to cross-instance feature-field alignment}}\\[-1em]
+\[
+\mathcal{L}_{\rm MV\text{-}FC}
+=
+\sum_{k=1}^{N}
+\left\|
+\Rend_{\rm f}(T\G_1,C_k^\star)
+-
+\Rend_{\rm f}(\G_2,C_k^\star)
+\right\|_2^2.
+\]
+
+\vspace{0em}
+
+\[
+T^\star =
+\operatorname*{arg\,min}_{T\in\Sim(3)}
+\mathcal{L}_{\rm MV\text{-}FC}.
+\]
+
+\vspace{0.6em}
+
+\Large
+The fine stage refines the coarse alignment by rendering both feature-augmented 3DGS models from multiple target views and optimizing the global $\Sim(3)$ transformation.
+}
+
+
+\block{\huge Qualitative Results}{
+\centering
+
+{\Large\textbf{Geometrically Consistent Object Replacement}}\par
+\vspace{0.2em}
+
+\includegraphics[
+    trim=0mm 0mm 0mm 0mm,
+    clip,
+    width=1.0\linewidth,
+    height=12.5cm,
+    keepaspectratio
+]{images/object_replacement_app.png}
+
+\vspace{0.7em}
+
+{\Large\textbf{Cross-Instance 3DGS Registration}}\par
+\vspace{0.25em}
+\noindent
+\begin{minipage}[t]{0.49\linewidth}
+\centering
+
+\makebox[\linewidth]{%
+    \makebox[0.33\linewidth][c]{\large\textbf{Random Init.}}%
+    \makebox[0.33\linewidth][c]{\large\textbf{GSA Coarse}}%
+    \makebox[0.33\linewidth][c]{\large\textbf{GSA Fine}}%
+}
+
+\vspace{0.2em}
+
+\includegraphics[
+    trim=90mm 40mm 0mm 30mm,
+    clip,
+    width=\linewidth,
+    height=8.4cm,
+    keepaspectratio
+]{images/cross_boat.png}
+
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.49\linewidth}
+\centering
+
+\makebox[\linewidth]{%
+    \makebox[0.33\linewidth][c]{\large\textbf{Random Init.}}%
+    \makebox[0.33\linewidth][c]{\large\textbf{GSA Coarse}}%
+    \makebox[0.33\linewidth][c]{\large\textbf{GSA Fine}}%
+}
+
+\vspace{0.2em}
+
+\includegraphics[
+    trim=90mm 45mm 0mm 0mm,
+    clip,
+    width=\linewidth,
+    height=8.4cm,
+    keepaspectratio
+]{images/cross_airplane.png}
+
+\end{minipage}
+}
+
+\block{\huge Quantitative Results}{
+\centering
+\Large
+
+\textbf{Same-Object 3DGS Registration}\par
+\vspace{0.25em}
+
+\noindent
+\begin{minipage}[t]{0.49\linewidth}
+\vspace{0pt}
+\centering
+
+% First row: 2 methods
+\SameObjectPanel{0.31\linewidth}{0}{FGR}
+\hspace{0.08\linewidth}
+\SameObjectPanel{0.31\linewidth}{1}{REGTR}
+
+\vspace{0.45em}
+
+% Second row: 3 methods
+\SameObjectPanel{0.31\linewidth}{2}{GaussReg}
+\hfill
+\SameObjectPanel{0.31\linewidth}{3}{GSA Coarse}
+\hfill
+\SameObjectPanel{0.31\linewidth}{4}{GSA Coarse+Fine}
+
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\linewidth}
+\vspace{0pt}
+\centering
+\renewcommand{\arraystretch}{1.15}
+\setlength{\tabcolsep}{5pt}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lcc}
+\toprule
+\textbf{Method} & \textbf{RRE ($^\circ$) $\downarrow$} & \textbf{ATE $\downarrow$} \\
+\midrule
+FGR & 51.32 & 0.33 \\
+REGTR & 125.34 & 0.38 \\
+DReg-NeRF & 10.37 & 0.04 \\
+GaussReg & 18.60 & 0.07 \\
+\midrule
+\textbf{GSA Coarse} & 3.13 & 0.01 \\
+\textbf{GSA Coarse+Fine} & \textbf{0.36} & \textbf{0.001} \\
+\bottomrule
+\end{tabular}}
+\end{minipage}
+
+\vspace{0.9em}
+
+\textbf{Cross-Instance Alignment on Synthetic Objects}\par
+{\large RRE ($^\circ$) $\downarrow$}\par
+\vspace{0.2em}
+
+\renewcommand{\arraystretch}{1.1}
+\setlength{\tabcolsep}{4pt}
+\resizebox{0.92\linewidth}{!}{%
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Method} & \textbf{Airplane} & \textbf{Bus} & \textbf{Boat} & \textbf{Car} & \textbf{Chair} & \textbf{Motor.} \\
+\midrule
+FGR & 90.78 & 94.98 & 86.60 & 89.32 & 91.53 & 82.06 \\
+REGTR & 90.00 & 77.69 & 90.98 & 96.98 & 94.75 & 86.97 \\
+GaussReg & 136.32 & 138.51 & 126.64 & 121.36 & 155.03 & 120.14 \\
+\midrule
+\textbf{GSA Coarse} & 2.97 & 4.74 & 23.97 & 3.70 & 14.17 & \textbf{3.13} \\
+\textbf{GSA Coarse+Fine} & \textbf{2.45} & \textbf{2.41} & \textbf{22.68} & \textbf{1.71} & \textbf{10.86} & 4.05 \\
+\bottomrule
+\end{tabular}}
+
+\vspace{0.85em}
+
+\textbf{Cross-Instance Alignment on Real Objects}\par
+{\large Median RRE ($^\circ$) $\downarrow$}\par
+\vspace{0.2em}
+
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Method} &
+\textbf{\shortstack[c]{CO3Dv2\\[0.25em]toyplane}} &
+\textbf{\shortstack[c]{CO3Dv2\\[0.25em]bicycle}} &
+\textbf{\shortstack[c]{CO3Dv2\\[0.25em]chair}} &
+\textbf{\shortstack[c]{3D Real\\[0.25em]car}} \\
+\midrule
+GaussReg & 121.77 & 122.27 & 125.66 & 107.66 \\
+\textbf{GSA Coarse} & 6.44 & \textbf{4.60} & 33.12 & 1.93 \\
+\textbf{GSA Coarse+Fine} & \textbf{5.22} & 9.27 & \textbf{22.67} & \textbf{1.34} \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.55em}
+
+\Large
+\textbf{Takeaway:} GSA recovers full $\Sim(3)$ alignment across different object instances and strongly outperforms geometry-only or same-instance baselines.
+}
+
+\end{columns}
+\end{document}

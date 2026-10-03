@@ -1,0 +1,19 @@
+\def\ASIC{Gupta:ICCV:2023:ASIC}
+\def\DINOMLS{Caron:NIPS:2020:unsupervised, Aberman:TOG:2018:bestbuddies}
+\def\DINONN{Amir:2021:VITdescriptoers}
+\def\VGGMLS{Aberman:TOG:2018:bestbuddies}
+\resizebox{\linewidth}{!}{
+    \begin{tabular}{lc|cc}
+    \toprule
+    \textbf{Method} & CUB-200 & \textbf{Method} & CUB-200 \\
+                    & (first 3 cate.) &               & (Subsets) \\
+    \midrule
+    VGG+MLS   & 25.8 & - & - \\
+    DINO+MLS & 67.0 & -  & - \\
+    DINO+NN   & 68.3 & GANgealing &  56.8 \\
+    ASIC        & \textbf{75.9} & NeuCongeal & 63.6 \\
+    SpaceJAM       & 69.6 & SpaceJAM  & \underline{69.9} \\
+    FastJAM (Ours) & \underline{75.3} & FastJAM (Ours)& \textbf{73.6} \\
+    \bottomrule
+    \end{tabular}
+}

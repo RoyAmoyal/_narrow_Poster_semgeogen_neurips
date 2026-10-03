@@ -1,0 +1,78 @@
+\centering
+\resizebox{0.9\linewidth}{!}{
+\begin{tabular}{@{}lcccccccccccccccccc|c@{}}
+\toprule
+\textbf{Method} & 
+Aero & Bike & Bird & Boat & Bottle & Bus & Car & Cat & Chair & Cow & Dog & Horse & Motor & Person & Plant & Sheep & Train & TV & \textbf{All} \\  
+
+\midrule
+ NeuCongeal [1] & 
+- & {29.1$^\star$} & - & - & - & - & - & 53.3 & - & - & 35.2 & - & - & - & - & - & - & - & - \\
+
+ ASIC [2] & 
+\underline{57.9} & % Aero
+{25.2} & % Bicycle
+\textbf{68.1} & % Bird
+{24.7} & % Boat
+35.4 & % Bottle
+28.4 & % Bus
+{30.9} & % Car
+{54.8} & % Cat
+{21.6} & % Chair
+{45.0} & % Cow
+\textbf{47.2} & % Dog
+{39.9} & % Horse
+{26.2} & % Bike/Motor
+{48.8} & % Person
+14.5 & % Plant
+\underline{24.5} & % Sheep
+{49.0} & % Train
+24.6 &  % TV Monitor
+{37.0} \\ % Average
+
+ SpaceJAM [3] &
+{53.6} & % Aero
+{\textbf{53.5}} & % Bicycle
+{45.4} & % Bird
+{\textbf{47.5}} & % Boat
+{\textbf{71.0}} & % Bottle
+{\underline{54.0}} & % Bus
+{\underline{46.0}} & % Car
+{\textbf{66.0}} & % Cat
+{\underline{25.8}} & % Chair
+{\underline{48.6}} & % Cow
+{28.5} & % Dog
+{\underline{47.6}} & % Horse
+{\underline{54.0}} & % Bike/Motor
+{\textbf{50.7}} & % Person
+{\underline{34.0}} & % Plant
+{09.0} & % Sheep
+{\underline{71.8}} & % Train
+{15.4} & % TV Monitor
+{\underline{45.7}} \\ % Average
+
+
+ FastJAM (Ours)&
+{\textbf{64.4}} & % Aero
+{\underline{43.3}} & % Bicycle
+{60.0} & % Bird
+{\underline{29.6}} & % Boat
+{\underline{58.4}} & % Bottle
+{\textbf{66.8}} & % Bus
+{\textbf{56.5}} & % Car
+{\underline{63.7}} & % Cat
+{\textbf{32.0}} & % Chair
+{\textbf{49.2}} & % Cow
+{\underline{40.8}} & % Dog
+{\textbf{53.7}} & % Horse
+{\textbf{62.8}} & % Bike/Motor
+{\underline{49.1}} & % Person
+{\textbf{42.9}} & % Plant
+{\textbf{33.4}} & % Sheep
+{\textbf{76.2}} & % Train
+{\textbf{71.2}} & % TV Monitor
+{\textbf{53.0}} \\ % Average
+
+\bottomrule
+
+\end{tabular}}

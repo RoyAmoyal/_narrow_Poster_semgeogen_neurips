@@ -1,0 +1,15 @@
+\centering
+\resizebox{0.8\linewidth}{!}{
+\centering
+\small
+\begin{tabular}{lccccc|c}
+\toprule
+\textbf{Method} & \# Params & \# Losses & \#HP & Atlas-free & \# Epochs & Runtime (hh:mm:ss) \\
+\midrule
+Neural Congealing [1] & 28.7M & 8 & 8 & \xmark & 8000 & 01:18:30 $\pm$ 00:06:18 \\
+ASIC [2] & 7.9M & 4 & 5 & \xmark & 20000 & 01:06:38 $\pm$ 00:00:38 \\
+SpaceJAM [3]& 0.016M & 1 & 0 & \cmark & 700 & 00:06:00 $\pm$ 00:00:12 \\
+FastJAM (Ours) & 0.13M & 1 & 0 & \cmark & 600 & \textbf{00:00:49} $\pm$ 00:00:04 \\
+\bottomrule
+\end{tabular}
+}
