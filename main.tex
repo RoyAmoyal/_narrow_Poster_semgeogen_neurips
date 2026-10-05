@@ -185,7 +185,7 @@ without manual labels. Used as pretraining data, it improves state-of-the-art mo
 
 \block{\huge\vphantom{Akg}Takeaway}{
 % vertical padding: aligns this block's bottom with the right column's last block
-\vspace*{0cm}
+\vspace*{0.28cm}
 \noindent
 \begin{minipage}[t]{0.29\linewidth}
 \vspace{0pt}
@@ -210,7 +210,7 @@ Scan for paper, code, and generated data.
 \textbf{[2]} Wimmer et al. \emph{Back to 3D: Few-Shot 3D Keypoint Detection with Back-Projected 2D Features}. CVPR 2024.\\
 \textbf{[3]} Wang et al. \emph{Orient Anything: Learning Robust Object Orientation Estimation from Rendering 3D Models}. ICML 2025.
 \end{minipage}
-\par\vspace*{0cm}
+\par\vspace*{0.28cm}
 }
 
 
@@ -256,27 +256,32 @@ geometry (excluding the rotationally symmetric bottle and potted plant).
 {\Large\textbf{Fine-tuning on all 18 SPair-71k categories}}\par
 {\large Our pretraining data is rigid-only, yet non-rigid categories also improve. PCK@0.10 $\uparrow$.}\par
 \vspace{0.2em}
-\renewcommand{\arraystretch}{1.2}
-\setlength{\tabcolsep}{12pt}
+\renewcommand{\arraystretch}{1.15}
+\setlength{\tabcolsep}{10pt}
 \large
-\begin{tabular}{lcc}
+\begin{tabular}{llcccc}
 \toprule
-\textbf{Method} & \textbf{Non-rigid-7} & \textbf{All-18} \\
+\textbf{Method} & \textbf{Training} & \textbf{Rigid-9} & \textbf{Non-rigid-7} & \textbf{Symmetric-2} & \textbf{All-18} \\
 \midrule
-GeoAware-SC & 86.94 $\rightarrow$ \textbf{88.23} (+1.29) & 82.09 $\rightarrow$ \textbf{84.48} (+2.39) \\
-MARCO & 90.79 $\rightarrow$ \textbf{92.06} (+1.27) & 87.30 $\rightarrow$ \textbf{88.98} (+1.68) \\
+& SPair-71k & 80.48 & 86.94 & 72.35 & 82.09 \\
+\rowcolor{oursrow}
+\multirow{-2}{*}{GeoAware-SC} & Ours P.T.\,$\rightarrow$\,SPair & \textbf{84.20} (+3.72) & \textbf{88.23} (+1.29) & \textbf{72.58} (+0.23) & \textbf{84.48} (+2.39) \\
+\midrule
+& SPair-71k & 87.32 & 90.79 & 74.99 & 87.30 \\
+\rowcolor{oursrow}
+\multirow{-2}{*}{MARCO} & Ours P.T.\,$\rightarrow$\,SPair & \textbf{89.61} (+2.29) & \textbf{92.06} (+1.27) & \textbf{75.38} (+0.39) & \textbf{88.98} (+1.68) \\
 \bottomrule
 \end{tabular}\par
 
 \vspace{0.7em}
 {\Large\textbf{MARCO: SPair-71k only (top) vs.\ Ours P.T.\,$\rightarrow$\,SPair-71k (bottom)}}\par
 \vspace{0.3em}
-\includegraphics[width=0.3\linewidth]{images/semgeogen/match_real_boat.png}\hspace{0.03\linewidth}%
-\includegraphics[width=0.3\linewidth]{images/semgeogen/match_real_chair.png}\hspace{0.03\linewidth}%
-\includegraphics[width=0.3\linewidth]{images/semgeogen/match_real_bus.png}\\[0.25em]
-\includegraphics[width=0.3\linewidth]{images/semgeogen/match_ours_boat.png}\hspace{0.03\linewidth}%
-\includegraphics[width=0.3\linewidth]{images/semgeogen/match_ours_chair.png}\hspace{0.03\linewidth}%
-\includegraphics[width=0.3\linewidth]{images/semgeogen/match_ours_bus.png}
+\includegraphics[width=0.27\linewidth]{images/semgeogen/match_real_boat.png}\hspace{0.04\linewidth}%
+\includegraphics[width=0.27\linewidth]{images/semgeogen/match_real_chair.png}\hspace{0.04\linewidth}%
+\includegraphics[width=0.27\linewidth]{images/semgeogen/match_real_bus.png}\\[0.25em]
+\includegraphics[width=0.27\linewidth]{images/semgeogen/match_ours_boat.png}\hspace{0.04\linewidth}%
+\includegraphics[width=0.27\linewidth]{images/semgeogen/match_ours_chair.png}\hspace{0.04\linewidth}%
+\includegraphics[width=0.27\linewidth]{images/semgeogen/match_ours_bus.png}
 
 \vspace{0.2em}
 {\large \textcolor{KellyGreen}{\textbf{Green}}: correct match; \textcolor{Red}{\textbf{red}}: wrong match.}
@@ -284,13 +289,13 @@ MARCO & 90.79 $\rightarrow$ \textbf{92.06} (+1.27) & 87.30 $\rightarrow$ \textbf
 
 \block{\huge\vphantom{Akg}Semantic Coverage \& Pruning}{
 \centering
-\makebox[0.96\linewidth]{%
+\makebox[0.9\linewidth]{%
     \makebox[0.333\linewidth][c]{\large\textbf{Rendering}}%
     \makebox[0.333\linewidth][c]{\large\textbf{Joint DINOv2 PCA}}%
     \makebox[0.333\linewidth][c]{\large\textbf{Semantic coverage}}%
 }\\[0.2em]
-\includegraphics[width=0.96\linewidth]{images/semgeogen/src_triplet_view2.png}\\[0.3em]
-\includegraphics[width=0.96\linewidth]{images/semgeogen/tgt_triplet_view2.png}
+\includegraphics[width=0.9\linewidth]{images/semgeogen/src_triplet_view2.png}\\[0.3em]
+\includegraphics[width=0.9\linewidth]{images/semgeogen/tgt_triplet_view2.png}
 
 \vspace{0.3em}
 \raggedright
