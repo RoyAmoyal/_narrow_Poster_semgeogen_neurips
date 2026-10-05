@@ -185,7 +185,7 @@ without manual labels. Used as pretraining data, it improves state-of-the-art mo
 
 \block{\huge\vphantom{Akg}Takeaway}{
 % vertical padding: aligns this block's bottom with the right column's last block
-\vspace*{0.28cm}
+\vspace*{0cm}
 \noindent
 \begin{minipage}[t]{0.29\linewidth}
 \vspace{0pt}
@@ -210,7 +210,7 @@ Scan for paper, code, and generated data.
 \textbf{[2]} Wimmer et al. \emph{Back to 3D: Few-Shot 3D Keypoint Detection with Back-Projected 2D Features}. CVPR 2024.\\
 \textbf{[3]} Wang et al. \emph{Orient Anything: Learning Robust Object Orientation Estimation from Rendering 3D Models}. ICML 2025.
 \end{minipage}
-\par\vspace*{0.28cm}
+\par\vspace*{0cm}
 }
 
 
@@ -228,7 +228,7 @@ geometry (excluding the rotationally symmetric bottle and potted plant).
 \centering
 {\large Recent supervised SOTA methods, no architectural changes. PCK@0.10 $\uparrow$. P.T.\ = pretraining.}\par
 \vspace{0.2em}
-\renewcommand{\arraystretch}{1.3}
+\renewcommand{\arraystretch}{1.2}
 \setlength{\tabcolsep}{5pt}
 \resizebox{\linewidth}{!}{%
 \begin{tabular}{llccccccccc|c}
@@ -250,13 +250,13 @@ geometry (excluding the rotationally symmetric bottle and potted plant).
 \end{tabular}}
 
 \vspace{0.3em}
-{\large\textbf{Pseudo-label quality matters:} DenseMatcher [1] pseudo-labels give GeoAware-SC only +0.77 mean PCK (vs.\ +4.37 with ours).}\par
+{\large\textbf{Pseudo-label quality matters:} DenseMatcher [1] gives GeoAware-SC only +0.77 (ours: +4.37).}\par
 
-\vspace{0.8em}
+\vspace{0.5em}
 {\Large\textbf{Fine-tuning on all 18 SPair-71k categories}}\par
 {\large Our pretraining data is rigid-only, yet non-rigid categories also improve. PCK@0.10 $\uparrow$.}\par
 \vspace{0.2em}
-\renewcommand{\arraystretch}{1.15}
+\renewcommand{\arraystretch}{1.08}
 \setlength{\tabcolsep}{10pt}
 \large
 \begin{tabular}{llcccc}
@@ -276,12 +276,12 @@ geometry (excluding the rotationally symmetric bottle and potted plant).
 \vspace{0.7em}
 {\Large\textbf{MARCO: SPair-71k only (top) vs.\ Ours P.T.\,$\rightarrow$\,SPair-71k (bottom)}}\par
 \vspace{0.3em}
-\includegraphics[width=0.27\linewidth]{images/semgeogen/match_real_boat.png}\hspace{0.04\linewidth}%
-\includegraphics[width=0.27\linewidth]{images/semgeogen/match_real_chair.png}\hspace{0.04\linewidth}%
-\includegraphics[width=0.27\linewidth]{images/semgeogen/match_real_bus.png}\\[0.25em]
-\includegraphics[width=0.27\linewidth]{images/semgeogen/match_ours_boat.png}\hspace{0.04\linewidth}%
-\includegraphics[width=0.27\linewidth]{images/semgeogen/match_ours_chair.png}\hspace{0.04\linewidth}%
-\includegraphics[width=0.27\linewidth]{images/semgeogen/match_ours_bus.png}
+\includegraphics[width=0.325\linewidth]{images/semgeogen/match_real_boat.png}\hfill
+\includegraphics[width=0.325\linewidth]{images/semgeogen/match_real_chair.png}\hfill
+\includegraphics[width=0.325\linewidth]{images/semgeogen/match_real_bus.png}\\[0.25em]
+\includegraphics[width=0.325\linewidth]{images/semgeogen/match_ours_boat.png}\hfill
+\includegraphics[width=0.325\linewidth]{images/semgeogen/match_ours_chair.png}\hfill
+\includegraphics[width=0.325\linewidth]{images/semgeogen/match_ours_bus.png}
 
 \vspace{0.2em}
 {\large \textcolor{KellyGreen}{\textbf{Green}}: correct match; \textcolor{Red}{\textbf{red}}: wrong match.}
