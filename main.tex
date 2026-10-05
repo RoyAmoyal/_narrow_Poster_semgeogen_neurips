@@ -32,6 +32,7 @@
 \definecolor{yellowpastel}{RGB}{247,237,163}
 \sethlcolor{yellowpastel}
 \colorlet{oursrow}{UWBlue!10}
+\definecolor{NeurIPSPurple}{HTML}{68448B}
 
 \tikzposterlatexaffectionproofoff
 \usetheme{UWTheme}
@@ -96,8 +97,8 @@ Cross-Instance Semantic-Geometric Correspondences}
 \node[anchor=west,yshift=2.8cm,xshift=1.0cm] at (TP@title.west)
 {\includegraphics[trim=0mm 20mm 0mm 20mm,clip,height=4.6cm]{images/logos/logo_bgu.pdf}};
 
-\node[anchor=east,yshift=2.8cm,xshift=-1.0cm] at (TP@title.east)
-{\includegraphics[height=5.4cm]{images/logos/NeurIPS_logo_cropped.png}};
+\node[anchor=east,yshift=2.8cm,xshift=-1.0cm,align=center,inner sep=0pt] at (TP@title.east)
+{\includegraphics[height=4.4cm]{images/logos/NeurIPS_2026_logo.png}};
 
 \begin{columns}
 
@@ -108,33 +109,32 @@ Cross-Instance Semantic-Geometric Correspondences}
 
 \block{\huge\vphantom{Akg}Motivation \& Goal}{
 \Large
-\textbf{Cross-instance correspondence} matches parts across \emph{different} objects of the same category,
-underlying semantic matching, category-level reasoning, and manipulation.
-
-\begin{itemize}[nosep,leftmargin=1.05em]
-    \item Supervision is \textbf{manual, sparse, and costly} to scale across categories.
-    \item Across instances, \textbf{exact point-level matches are often ill-defined}.
-\end{itemize}
+\textbf{Cross-instance semantic-geometric correspondence} matches the same semantic and geometric \mbox{location} on \emph{different} objects in a category, e.g., the \emph{left} wing tip of two airplanes.
 
 \vspace{0.3em}
-\textbf{Our question:} can \hl{\emph{approximate} correspondences}, if semantically meaningful,
-geometrically consistent, and diverse, provide effective supervision at scale?
+\textbf{Problem:} supervision is \textbf{manual, sparse, and costly} to scale, and exact point-level matches
+across instances are often ill-defined.
+
+\vspace{0.3em}
+\textbf{Our solution:} automatically generate {\setlength{\fboxsep}{0.12em}\colorbox{yellowpastel}{\strut\emph{approximate} semantic-geometric correspondences}}
+from rotation-aligned 3D objects. This yields scalable 3D--3D, 3D--2D, and 2D--2D supervision
+without manual labels. Used as pretraining data, it improves state-of-the-art models.
 
 \vspace{0.5em}
 \centering
-\begin{minipage}[t]{0.32\linewidth}
+\begin{minipage}[t]{0.29\linewidth}
 \centering
-\includegraphics[width=\linewidth,height=11.5cm,keepaspectratio]{images/semgeogen/2d_2d.png}\\[0.2em]
+\includegraphics[width=\linewidth,height=17cm,keepaspectratio]{images/semgeogen/2d_2d.png}\\[0.2em]
 {\Large\textbf{2D--2D}}
-\end{minipage}\hfill
-\begin{minipage}[t]{0.32\linewidth}
+\end{minipage}\hspace{0.03\linewidth}%
+\begin{minipage}[t]{0.29\linewidth}
 \centering
-\includegraphics[width=\linewidth,height=11.5cm,keepaspectratio]{images/semgeogen/3d_2d.png}\\[0.2em]
+\includegraphics[width=\linewidth,height=17cm,keepaspectratio]{images/semgeogen/3d_2d.png}\\[0.2em]
 {\Large\textbf{3D--2D}}
-\end{minipage}\hfill
-\begin{minipage}[t]{0.32\linewidth}
+\end{minipage}\hspace{0.03\linewidth}%
+\begin{minipage}[t]{0.29\linewidth}
 \centering
-\includegraphics[width=\linewidth,height=11.5cm,keepaspectratio]{images/semgeogen/3d_3d.png}\\[0.2em]
+\includegraphics[width=\linewidth,height=17cm,keepaspectratio]{images/semgeogen/3d_3d.png}\\[0.2em]
 {\Large\textbf{3D--3D}}
 \end{minipage}
 
@@ -145,65 +145,56 @@ geometrically consistent, and diverse, provide effective supervision at scale?
 \vspace{0.6em}
 \StatBox{0}{manual labels\\(no point / part / corr.)}\hfill
 \StatBox{93\%}{PCK@0.10 vs.\\human KeypointNet}\hfill
-\StatBox{+4.4 / +2.9}{SPair-71k mean PCK\\GeoAware-SC / MARCO}
+\StatBox{+4.4 / +2.9}{SPair-71k Rigid-9 PCK\\GeoAware-SC / MARCO}
 }
 
 \block{\huge\vphantom{Akg}SemGeo-Gen Pipeline}{
 \centering
-\includegraphics[width=\linewidth,height=17cm,keepaspectratio]{images/semgeogen/powerpoint_full_method.png}
+\includegraphics[width=\linewidth,height=19.5cm,keepaspectratio]{images/semgeogen/powerpoint_full_method.png}
 
 \vspace{0.4em}
 \raggedright
 \Large
-\textbf{Input:} pairs $(\cS,\cT)$ that are only \textbf{rotation-aligned and scale-normalized},
-a weak category-level prior with \emph{no} point, part, or correspondence supervision.
+\textbf{Input:} only \textbf{rotation-aligned} object pairs; no point, part, or correspondence labels.
 
-\begin{enumerate}[nosep,leftmargin=1.3em,itemsep=0.25em]
-    \item \textbf{Lift features:} render multiple views, extract dense DINOv2 features, lift them to 3D points.
-    \item \textbf{CPA registration:} non-rigidly deform the source onto the target.
-    \item \textbf{Match \& prune:} nearest-neighbor matches, then remove semantically inconsistent ones.
-\end{enumerate}
 }
 
 \block{\huge\vphantom{Akg}Method}{
 \Large
-\textbf{Semantic similarity} (joint 64-D PCA of DINOv2 descriptors $z$)
-\[
-\ssem(x_i,x_j)=\frac{z_i^\top z_j}{\|z_i\|_2\,\|z_j\|_2}>\tsem,
-\qquad \tsem=0.85.
-\]
-
-\textbf{Continuous piecewise-affine (CPA) registration.}
-A Delaunay-tetrahedralized control grid with per-vertex displacements $u_v$ gives a deformation
-that is affine inside each tetrahedron and continuous across cells:
-\[
-\cL_{\mathrm{CPA}}
-=\cL_{\mathrm{Chamfer}}\!\big(\TCPA(\cX_S),\cX_T\big)
-+\lambda\,\frac{1}{|\mathcal{E}|}\!\sum_{(a,b)\in\mathcal{E}}\!\|u_a-u_b\|_2^2 .
-\]
-
-\textbf{Match, then prune.} With $\hat{x}_i^S=\TCPA(x_i^S)$:
-\[
-a(i)=\arg\min_{j}\|\hat{x}_i^S-x_j^T\|_2,
-\qquad
-\cC_{\cS,\cT}=\big\{(x_i^S,x_{a(i)}^T)\;:\;\ssem(x_i^S,x_{a(i)}^T)>\tsem\big\}.
-\]
-
-\textbf{Project to 2D.} Rendering with cameras $\pi_{c_S},\pi_{c_T}$ turns each 3D match into
-3D--2D and 2D--2D supervision: $(u_i^S,u_j^T)=\big(\pi_{c_S}(x_i^S),\pi_{c_T}(x_j^T)\big)$.
-$N$ objects give up to $\binom{N}{2}$ pairs, each renderable from many views.
+\begin{itemize}[leftmargin=1.1em,itemsep=0.7em,topsep=0pt]
+    \item \textbf{Semantic features $f$:} dense DINOv2 features from many rendered views, lifted to 3D.
+    \item \textbf{Continuous piecewise-affine (CPA) registration:} deform the source onto the target
+    by moving control-grid vertices by $u_v$ ($\mathcal{E}$: neighboring-vertex edges),
+    \[
+    \min_{T}\; \cL_{\mathrm{Chamfer}}\big(\hat{\cX}_S,\cX_T\big)+\lambda\,\mathcal{R}_{\mathrm{smooth}}(T),
+    \qquad \hat{\cX}_S=T(\cX_S),
+    \]
+    \[
+    \cL_{\mathrm{Chamfer}}=
+    \tfrac{1}{|\hat{\cX}_S|}\!\sum_{\hat{x}\in\hat{\cX}_S}\min_{x\in\cX_T}\|\hat{x}-x\|_2^2
+    +\tfrac{1}{|\cX_T|}\!\sum_{x\in\cX_T}\min_{\hat{x}\in\hat{\cX}_S}\|x-\hat{x}\|_2^2,
+    \qquad
+    \mathcal{R}_{\mathrm{smooth}}=\tfrac{1}{|\mathcal{E}|}\!\sum_{(a,b)\in\mathcal{E}}\|u_a-u_b\|_2^2,
+    \]
+    \item \textbf{Match \& prune:} nearest-neighbor matching after deformation; keep only matches with
+    cosine similarity $\mathrm{sim}(f^S_i,f^T_j)>0.85$.
+    \item \textbf{Project to 2D, scale combinatorially:} $N$ objects yield up to $\binom{N}{2}$ pairs, each rendered
+    from many views into 3D--2D and 2D--2D matches.
+\end{itemize}
 }
 
 \block{\huge\vphantom{Akg}Takeaway}{
+% vertical padding: aligns this block's bottom with the right column's last block
+\vspace*{0cm}
 \noindent
-\begin{minipage}[t]{0.25\linewidth}
+\begin{minipage}[t]{0.29\linewidth}
 \vspace{0pt}
 \centering
 % TODO: placeholder QR (from the GSA poster) - replace with the SemGeo-Gen QR code
-\includegraphics[width=0.85\linewidth]{images/gsa_web_qr_canva.jpeg}
+\includegraphics[width=\linewidth]{images/gsa_web_qr_canva.jpeg}
 \end{minipage}
 \hfill
-\begin{minipage}[t]{0.72\linewidth}
+\begin{minipage}[t]{0.67\linewidth}
 \vspace{0pt}
 \Large
 Approximate semantic-geometric correspondences generated from 3D assets, \textbf{without manual correspondence annotation},
@@ -212,7 +203,14 @@ are a scalable training signal that improves real-image semantic correspondence.
 \vspace{0.4em}
 \large
 Scan for paper, code, and generated data.
+
+\vspace{0.6em}
+\normalsize
+\textbf{[1]} Zhu et al. \emph{DenseMatcher: Learning 3D Semantic Correspondence for Category-Level Manipulation from One Demo}. ICLR 2025.\\
+\textbf{[2]} Wimmer et al. \emph{Back to 3D: Few-Shot 3D Keypoint Detection with Back-Projected 2D Features}. CVPR 2024.\\
+\textbf{[3]} Wang et al. \emph{Orient Anything: Learning Robust Object Orientation Estimation from Rendering 3D Models}. ICML 2025.
 \end{minipage}
+\par\vspace*{0cm}
 }
 
 
@@ -223,12 +221,12 @@ Scan for paper, code, and generated data.
 
 \block{\huge\vphantom{Akg}Pretraining Boosts SPair-71k}{
 \Large
-Pretrain on our generated 2D pairs (12K per category, Objaverse-OA), then fine-tune on real SPair-71k.
-\textbf{No architectural changes.}
+Pretrain on our 2D pairs, then fine-tune on \textbf{Rigid-9}: the rigid SPair-71k categories with distinct
+geometry (excluding the rotationally symmetric bottle and potted plant).
 
 \vspace{0.3em}
 \centering
-{\large Recent supervised SOTA methods under different training regimes. PCK@0.10 $\uparrow$. P.T.\ = pretraining.}\par
+{\large Recent supervised SOTA methods, no architectural changes. PCK@0.10 $\uparrow$. P.T.\ = pretraining.}\par
 \vspace{0.2em}
 \renewcommand{\arraystretch}{1.3}
 \setlength{\tabcolsep}{5pt}
@@ -251,15 +249,34 @@ Pretrain on our generated 2D pairs (12K per category, Objaverse-OA), then fine-t
 \bottomrule
 \end{tabular}}
 
+\vspace{0.3em}
+{\large\textbf{Pseudo-label quality matters:} DenseMatcher [1] pseudo-labels give GeoAware-SC only +0.77 mean PCK (vs.\ +4.37 with ours).}\par
+
+\vspace{0.8em}
+{\Large\textbf{Fine-tuning on all 18 SPair-71k categories}}\par
+{\large Our pretraining data is rigid-only, yet non-rigid categories also improve. PCK@0.10 $\uparrow$.}\par
+\vspace{0.2em}
+\renewcommand{\arraystretch}{1.2}
+\setlength{\tabcolsep}{12pt}
+\large
+\begin{tabular}{lcc}
+\toprule
+\textbf{Method} & \textbf{Non-rigid-7} & \textbf{All-18} \\
+\midrule
+GeoAware-SC & 86.94 $\rightarrow$ \textbf{88.23} (+1.29) & 82.09 $\rightarrow$ \textbf{84.48} (+2.39) \\
+MARCO & 90.79 $\rightarrow$ \textbf{92.06} (+1.27) & 87.30 $\rightarrow$ \textbf{88.98} (+1.68) \\
+\bottomrule
+\end{tabular}\par
+
 \vspace{0.7em}
 {\Large\textbf{MARCO: SPair-71k only (top) vs.\ Ours P.T.\,$\rightarrow$\,SPair-71k (bottom)}}\par
 \vspace{0.3em}
-\includegraphics[width=0.325\linewidth]{images/semgeogen/match_real_boat.png}\hfill
-\includegraphics[width=0.325\linewidth]{images/semgeogen/match_real_chair.png}\hfill
-\includegraphics[width=0.325\linewidth]{images/semgeogen/match_real_bus.png}\\[0.25em]
-\includegraphics[width=0.325\linewidth]{images/semgeogen/match_ours_boat.png}\hfill
-\includegraphics[width=0.325\linewidth]{images/semgeogen/match_ours_chair.png}\hfill
-\includegraphics[width=0.325\linewidth]{images/semgeogen/match_ours_bus.png}
+\includegraphics[width=0.3\linewidth]{images/semgeogen/match_real_boat.png}\hspace{0.03\linewidth}%
+\includegraphics[width=0.3\linewidth]{images/semgeogen/match_real_chair.png}\hspace{0.03\linewidth}%
+\includegraphics[width=0.3\linewidth]{images/semgeogen/match_real_bus.png}\\[0.25em]
+\includegraphics[width=0.3\linewidth]{images/semgeogen/match_ours_boat.png}\hspace{0.03\linewidth}%
+\includegraphics[width=0.3\linewidth]{images/semgeogen/match_ours_chair.png}\hspace{0.03\linewidth}%
+\includegraphics[width=0.3\linewidth]{images/semgeogen/match_ours_bus.png}
 
 \vspace{0.2em}
 {\large \textcolor{KellyGreen}{\textbf{Green}}: correct match; \textcolor{Red}{\textbf{red}}: wrong match.}
@@ -267,25 +284,20 @@ Pretrain on our generated 2D pairs (12K per category, Objaverse-OA), then fine-t
 
 \block{\huge\vphantom{Akg}Semantic Coverage \& Pruning}{
 \centering
-\makebox[0.98\linewidth]{%
+\makebox[0.96\linewidth]{%
     \makebox[0.333\linewidth][c]{\large\textbf{Rendering}}%
     \makebox[0.333\linewidth][c]{\large\textbf{Joint DINOv2 PCA}}%
     \makebox[0.333\linewidth][c]{\large\textbf{Semantic coverage}}%
 }\\[0.2em]
-\includegraphics[width=0.98\linewidth]{images/semgeogen/src_triplet_view2.png}\\[0.3em]
-\includegraphics[width=0.98\linewidth]{images/semgeogen/tgt_triplet_view2.png}
+\includegraphics[width=0.96\linewidth]{images/semgeogen/src_triplet_view2.png}\\[0.3em]
+\includegraphics[width=0.96\linewidth]{images/semgeogen/tgt_triplet_view2.png}
 
 \vspace{0.3em}
 \raggedright
 \Large
-\textcolor{KellyGreen}{\textbf{Green}}: has a semantic match in the paired object; \textcolor{Red}{\textbf{red}}: none (exposed seats)
-and never gets correspondences. Pairs with low coverage ($\rho_{\mathrm{sem}}<0.6$) are optionally filtered.
+\textcolor{KellyGreen}{\textbf{Green}}: has a semantic match in the paired object; \textcolor{Red}{\textbf{red}}: has none (exposed seats)
+and receives no correspondences. Pairs with low coverage ($\rho_{\mathrm{sem}}<0.6$) are optionally filtered.
 
-\vspace{0.5em}
-\centering
-\includegraphics[width=0.52\linewidth]{images/semgeogen/sparse15_view10.png}\par
-\vspace{0.2em}
-{\large Final correspondences: seats, steering wheel, and the white roof get no matches.}
 }
 
 \block{\huge\vphantom{Akg}Agreement with Human Annotations}{
@@ -309,14 +321,15 @@ Generated 3D matches vs.\ human keypoints on \textbf{KeypointNet} (evaluation on
 \end{tabular}}
 
 \vspace{0.8em}
-\begin{minipage}[t]{0.40\linewidth}
+\begin{minipage}[t]{0.235\linewidth}
 \centering
-{\Large\textbf{Semantic filtering}}\par
+{\Large\textbf{Semantic filtering}\vphantom{Akg}}\par
 \vspace{0.2em}
-\large
+\normalsize
+\setlength{\tabcolsep}{4pt}
 \begin{tabular}{lc}
 \toprule
-\textbf{Setting} & \textbf{PCK@.10} \\
+\textbf{Setting} & \textbf{@.10} \\
 \midrule
 Geometry only & 0.84 \\
 + corr.\ pruning & 0.91 \\
@@ -325,15 +338,15 @@ Geometry only & 0.84 \\
 \bottomrule
 \end{tabular}
 \end{minipage}\hfill
-\begin{minipage}[t]{0.57\linewidth}
+\begin{minipage}[t]{0.315\linewidth}
 \centering
-{\Large\textbf{Registration model}}\par
+{\Large\textbf{Registration model}\vphantom{Akg}}\par
 \vspace{0.2em}
-\large
-\setlength{\tabcolsep}{6pt}
+\normalsize
+\setlength{\tabcolsep}{4pt}
 \begin{tabular}{lccc}
 \toprule
-\textbf{Model} & \textbf{s/pair} & \textbf{PCK@.05} & \textbf{PCK@.10} \\
+\textbf{Model} & \textbf{s/pair} & \textbf{@.05} & \textbf{@.10} \\
 \midrule
 Affine & 1.15 & 0.686 & 0.898 \\
 TPS & 3.71 & \textbf{0.739} & 0.919 \\
@@ -341,18 +354,37 @@ TPS & 3.71 & \textbf{0.739} & 0.919 \\
 \textbf{CPA (ours)} & \textbf{1.13} & 0.729 & \textbf{0.922} \\
 \bottomrule
 \end{tabular}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.42\linewidth}
+\centering
+{\Large\textbf{vs.\ Back to 3D [2]}\vphantom{Akg}}\par
+\vspace{0.2em}
+\normalsize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Method} & \textbf{@.05} & \textbf{@.10} & \textbf{@.15} & \textbf{@.20} \\
+\midrule
+Back to 3D (1-shot) & 0.438 & 0.632 & 0.725 & 0.777 \\
+Back to 3D (3-shot) & 0.436 & 0.641 & 0.740 & 0.799 \\
+\rowcolor{oursrow}
+\textbf{Ours (zero-shot)} & \textbf{0.648} & \textbf{0.865} & \textbf{0.945} & \textbf{0.977} \\
+\bottomrule
+\end{tabular}\par
+\vspace{0.2em}
+{\normalsize Mean PCK on a subset of 100 pairs/category.}
 \end{minipage}
 }
 
 \block{\huge\vphantom{Akg}Beyond Existing Datasets}{
 \Large
-Correspondences generated on Objaverse-OA categories not covered by existing correspondence datasets.
+Our correspondences on Objaverse-OA [3] categories absent from existing datasets.
 
 \vspace{0.3em}
 \centering
-\includegraphics[width=0.36\linewidth,height=8.6cm,keepaspectratio]{images/semgeogen/baby_buggy_highres.png}\hfill
-\includegraphics[width=0.29\linewidth,height=8.6cm,keepaspectratio]{images/semgeogen/backpack_highres.png}\hfill
-\includegraphics[width=0.33\linewidth,height=8.6cm,keepaspectratio]{images/semgeogen/barbell.png}
+\includegraphics[width=0.36\linewidth,height=7.6cm,keepaspectratio]{images/semgeogen/baby_buggy_highres.png}\hfill
+\includegraphics[width=0.29\linewidth,height=7.6cm,keepaspectratio]{images/semgeogen/backpack_highres.png}\hfill
+\includegraphics[width=0.33\linewidth,height=7.6cm,keepaspectratio]{images/semgeogen/barbell.png}
 }
 
 \end{columns}
